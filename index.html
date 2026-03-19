@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#1a6b3c">
+<title>Sauti ya Haki – Mobile</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --green:#1a6b3c;--green-2:#22854b;--green-light:#e6f4ed;
+  --amber:#b86e00;--amber-light:#fff3dc;
+  --red:#c0392b;--red-light:#fdecea;
+  --blue:#1557ad;--blue-light:#e8f0fd;
+  --bg:#f2f0eb;--surface:#ffffff;--border:#dedad2;
+  --text:#18180f;--muted:#686660;--hint:#aaa9a1;
+  --r:18px;--r-sm:12px;--r-xs:8px;
+  --ff:'Plus Jakarta Sans',sans-serif;
+}
+html,body{height:100%;overflow:hidden;background:var(--bg)}
+body{font-family:var(--ff);color:var(--text);display:flex;flex-direction:column;max-width:430px;margin:0 auto}
+.status-bar{height:env(safe-area-inset-top,12px);background:var(--green);flex-shrink:0}
+.topbar{background:var(--green);color:#fff;padding:12px 18px 14px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.topbar-logo{font-size:19px;font-weight:800;letter-spacing:-0.3px}
+.topbar-sub{font-size:11px;opacity:0.75;margin-top:1px;font-weight:500}
+.sos-pill{background:var(--red);color:#fff;border:none;border-radius:20px;padding:7px 14px;font-family:var(--ff);font-size:12px;font-weight:700;cursor:pointer}
+.scroll-body{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding-bottom:80px}
+.screen{display:none;padding:16px 16px 0;animation:fi .18s ease}
+.screen.active{display:block}
+@keyframes fi{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+.bottom-nav{flex-shrink:0;background:var(--surface);border-top:1px solid var(--border);display:flex;padding-bottom:env(safe-area-inset-bottom,4px)}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;padding:10px 2px 8px;cursor:pointer;border:none;background:none;gap:3px;font-family:var(--ff);position:relative}
+.nav-icon{font-size:20px;line-height:1}
+.nav-label{font-size:10px;color:var(--hint);font-weight:600}
+.nav-item.active .nav-label{color:var(--green)}
+.nav-item.active::after{content:'';position:absolute;top:0;left:30%;right:30%;height:2.5px;background:var(--green);border-radius:0 0 3px 3px}
+.hero{background:var(--green);border-radius:var(--r);padding:20px 18px 22px;color:#fff;margin-bottom:16px;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;right:-16px;top:-16px;width:100px;height:100px;border-radius:50%;background:rgba(255,255,255,0.06)}
+.hero h2{font-size:22px;font-weight:800;line-height:1.25;margin-bottom:6px;position:relative}
+.hero p{font-size:13px;opacity:0.85;line-height:1.5;position:relative}
+.sos-card{background:var(--red);border-radius:var(--r-sm);padding:14px 16px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;cursor:pointer}
+.sos-card-text{color:#fff}
+.sos-title{font-size:14px;font-weight:700}
+.sos-sub{font-size:12px;opacity:0.85;margin-top:2px}
+.sos-btn{background:rgba(255,255,255,0.2);border:none;color:#fff;border-radius:var(--r-xs);padding:9px 14px;font-family:var(--ff);font-size:12px;font-weight:700;cursor:pointer}
+.slabel{font-size:11px;font-weight:700;color:var(--hint);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:10px}
+.tile-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.tile{background:var(--surface);border-radius:var(--r);padding:16px 14px;cursor:pointer;border:1px solid var(--border);transition:transform .12s;display:flex;flex-direction:column;gap:10px}
+.tile:active{transform:scale(0.97);background:var(--bg)}
+.tile-icon{font-size:28px;line-height:1}
+.tile-title{font-size:14px;font-weight:700;line-height:1.3}
+.tile-desc{font-size:12px;color:var(--muted);line-height:1.4;margin-top:2px}
+.tile.accent{background:var(--green);border-color:var(--green)}
+.tile.accent .tile-title,.tile.accent .tile-desc{color:#fff}
+.tile.accent .tile-desc{opacity:.85}
+.alert{border-radius:var(--r-sm);padding:11px 13px;font-size:13px;line-height:1.5;margin-bottom:14px;font-weight:500}
+.alert-info{background:var(--blue-light);color:var(--blue)}
+.alert-warn{background:var(--amber-light);color:var(--amber)}
+.step-bar{display:flex;gap:6px;margin-bottom:16px}
+.step-dot{flex:1;height:4px;border-radius:2px;background:var(--border)}
+.step-dot.done{background:var(--green)}.step-dot.active{background:var(--green-2)}
+.cat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.cat-card{background:var(--surface);border:2px solid var(--border);border-radius:var(--r);padding:14px 10px;display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;text-align:center;transition:all .12s}
+.cat-card:active{transform:scale(0.96)}
+.cat-card.selected{border-color:var(--green);background:var(--green-light)}
+.cat-card.selected .cat-label{color:var(--green)}
+.cat-emoji{font-size:30px}
+.cat-label{font-size:12px;font-weight:700;line-height:1.3}
+.form-group{margin-bottom:16px}
+.form-label{font-size:13px;font-weight:700;margin-bottom:6px;display:block}
+.req{color:var(--red)}
+textarea,input[type=text],select{width:100%;background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r-sm);padding:12px 14px;font-family:var(--ff);font-size:15px;color:var(--text);resize:none;outline:none;-webkit-appearance:none}
+textarea:focus,input:focus,select:focus{border-color:var(--green)}
+.voice-btn{width:100%;background:var(--blue-light);color:var(--blue);border:1.5px solid #90caf9;border-radius:var(--r-sm);padding:12px 14px;font-family:var(--ff);font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.voice-btn.listening{background:#bbdefb;animation:pulse 1s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.65}}
+.sev-row{display:flex;gap:8px}
+.sev-btn{flex:1;padding:11px 4px;border-radius:var(--r-sm);border:2px solid var(--border);background:var(--surface);font-family:var(--ff);font-size:12px;font-weight:700;cursor:pointer}
+.sev-btn[data-level="low"].active{border-color:#fbc02d;background:#fffde7;color:#e65100}
+.sev-btn[data-level="medium"].active{border-color:#fb8c00;background:#fff3e0;color:#bf360c}
+.sev-btn[data-level="high"].active{border-color:var(--red);background:var(--red-light);color:var(--red)}
+.btn{display:block;width:100%;padding:15px;border-radius:var(--r-sm);border:none;font-family:var(--ff);font-size:15px;font-weight:700;cursor:pointer;text-align:center;transition:all .12s}
+.btn:active{transform:scale(0.98)}
+.btn-primary{background:var(--green);color:#fff}
+.btn-secondary{background:var(--surface);color:var(--text);border:1.5px solid var(--border)}
+.btn-amber{background:var(--amber);color:#fff}
+.btn-sm{font-size:13px;padding:10px 16px;width:auto;display:inline-block}
+.mt-8{margin-top:8px}.mt-12{margin-top:12px}.mt-16{margin-top:16px}
+.review-table{width:100%;font-size:13px;border-collapse:collapse}
+.review-table td{padding:7px 0;vertical-align:top}
+.review-table td:first-child{color:var(--muted);width:80px;font-weight:600}
+.badge{display:inline-block;font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px}
+.badge-submitted{background:var(--green-light);color:var(--green)}
+.badge-pending{background:#fff3e0;color:#e65100}
+.rights-card{background:var(--surface);border-radius:var(--r);border:1px solid var(--border);padding:16px;margin-bottom:10px}
+.rights-tag{font-size:11px;font-weight:700;color:var(--green);background:var(--green-light);padding:3px 10px;border-radius:20px;display:inline-block;margin-bottom:8px}
+.rights-title{font-size:15px;font-weight:700;margin-bottom:5px}
+.rights-body{font-size:13px;color:var(--muted);line-height:1.6}
+.legal-card{background:var(--surface);border-radius:var(--r);border:1px solid var(--border);padding:14px 16px;margin-bottom:10px}
+.legal-name{font-size:15px;font-weight:700;margin-bottom:4px}
+.legal-tag{font-size:11px;font-weight:700;color:var(--green);background:var(--green-light);padding:2px 9px;border-radius:20px;display:inline-block;margin-bottom:8px}
+.legal-detail{font-size:13px;color:var(--muted);margin-bottom:3px}
+.legal-btns{display:flex;gap:8px;margin-top:10px}
+.legal-btn{flex:1;padding:10px;border-radius:var(--r-sm);border:1.5px solid var(--border);background:var(--surface);font-family:var(--ff);font-size:13px;font-weight:700;cursor:pointer;text-align:center}
+.legal-btn.primary{background:var(--green);color:#fff;border-color:var(--green)}
+.tabs{display:flex;gap:7px;margin-bottom:14px;overflow-x:auto;padding-bottom:1px}
+.tabs::-webkit-scrollbar{display:none}
+.tab{padding:7px 14px;border-radius:20px;border:1.5px solid var(--border);background:var(--surface);font-family:var(--ff);font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;color:var(--muted)}
+.tab.active{background:var(--green);color:#fff;border-color:var(--green)}
+.ai-box{background:var(--green-light);border-radius:var(--r);border:1px solid #b2d8bc;padding:14px;margin-top:12px}
+.ai-header{font-size:13px;font-weight:700;color:var(--green);margin-bottom:8px}
+.ai-body{font-size:13px;line-height:1.7;color:var(--text)}
+.dots{display:flex;gap:4px;padding:4px 0}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--green);animation:b 1.2s infinite}
+.dot:nth-child(2){animation-delay:.2s}.dot:nth-child(3){animation-delay:.4s}
+@keyframes b{0%,80%,100%{transform:scale(0.5);opacity:.4}40%{transform:scale(1);opacity:1}}
+.rp-card{background:var(--surface);border-radius:var(--r);border:1px solid var(--border);padding:14px 16px;margin-bottom:10px}
+.rp-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px}
+.rp-id{font-size:10px;color:var(--hint);font-weight:700;letter-spacing:.5px}
+.rp-type{font-size:14px;font-weight:700}
+.rp-date{font-size:12px;color:var(--muted);margin-top:2px}
+.rp-preview{font-size:12px;color:var(--muted);line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin-top:6px}
+.success-wrap{text-align:center;padding:30px 10px 20px}
+.success-icon{font-size:60px;margin-bottom:12px}
+.success-h{font-size:24px;font-weight:800;color:var(--green);margin-bottom:8px}
+.success-p{font-size:14px;color:var(--muted);line-height:1.5}
+.ref-chip{background:var(--green-light);border-radius:var(--r-sm);padding:12px 20px;display:inline-block;margin:14px 0;font-size:20px;font-weight:800;color:var(--green);letter-spacing:3px}
+.letter-box{background:#fffef9;border:1px solid #e4e0cc;border-radius:var(--r-sm);padding:16px;font-size:13px;line-height:1.8;color:var(--text);white-space:pre-wrap;font-family:Georgia,serif;margin-top:10px}
+.empty{text-align:center;padding:36px 20px;color:var(--muted)}
+.empty-icon{font-size:44px;margin-bottom:10px}
+.search-wrap{position:relative;margin-bottom:14px}
+.search-wrap input{padding-left:38px}
+.search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:16px;pointer-events:none}
+
+/* MOBILE CHAT */
+.m-ai,.m-user{display:flex;flex-direction:column;gap:3px}
+.m-user{align-items:flex-end}
+.mb-ai{background:var(--green-light);border:1px solid var(--green-mid);color:var(--text);padding:10px 13px;border-radius:4px 14px 14px 14px;font-size:13px;line-height:1.6;max-width:90%;word-break:break-word}
+.mb-user{background:var(--green);color:#fff;padding:10px 13px;border-radius:14px 14px 4px 14px;font-size:13px;line-height:1.6;max-width:90%;word-break:break-word}
+.mt{font-size:10px;color:var(--hint);padding:0 4px}
+.m-typing{display:flex;gap:4px;align-items:center;padding:12px 13px}
+.m-chip{padding:6px 12px;border-radius:20px;border:1.5px solid var(--green-mid);background:var(--green-light);color:var(--green);font-size:11px;font-weight:700;cursor:pointer;font-family:var(--ff);white-space:nowrap;flex-shrink:0}
+</style>
+</head>
+<body>
+<div class="status-bar"></div>
+<div class="topbar">
+  <div><div class="topbar-logo">Sauti ya Haki</div><div class="topbar-sub">Disability Justice · Uganda</div></div>
+  <button class="sos-pill" onclick="callSOS()">🆘 SOS 999</button>
+</div>
+<div class="scroll-body">
+
+<!-- HOME -->
+<div class="screen active" id="s-home">
+  <div class="hero">
+    <h2>Your rights are real. Your voice matters.</h2>
+    <p>Report violations · Know your rights · Get free legal help</p>
+  </div>
+  <div class="sos-card" onclick="callSOS()">
+    <div class="sos-card-text">
+      <div class="sos-title">🆘 Emergency / Immediate Danger</div>
+      <div class="sos-sub">Uganda Police: 999 · Ambulance: 112</div>
+    </div>
+    <button class="sos-btn" onclick="event.stopPropagation();callSOS()">CALL NOW</button>
+  </div>
+  <div class="slabel">Quick Actions</div>
+  <div class="tile-grid">
+    <div class="tile accent" onclick="go('s-report')"><div class="tile-icon">📋</div><div><div class="tile-title">Make a Report</div><div class="tile-desc">Report abuse or violation</div></div></div>
+    <div class="tile" onclick="go('s-rights')"><div class="tile-icon">⚖️</div><div><div class="tile-title">Know Your Rights</div><div class="tile-desc">Uganda disability law</div></div></div>
+    <div class="tile" onclick="go('s-legal')"><div class="tile-icon">🏛️</div><div><div class="tile-title">Legal Aid</div><div class="tile-desc">Free lawyers near you</div></div></div>
+    <div class="tile" onclick="go('s-letter')"><div class="tile-icon">📝</div><div><div class="tile-title">Complaint Letter</div><div class="tile-desc">AI-generated formal letter</div></div></div>
+  </div>
+  <div class="slabel">Recent Reports</div>
+  <div id="home-rps"></div>
+</div>
+
+<!-- REPORT -->
+<div class="screen" id="s-report">
+  <div id="r1">
+    <div class="step-bar"><div class="step-dot active"></div><div class="step-dot"></div><div class="step-dot"></div></div>
+    <div class="slabel">What are you reporting?</div>
+    <div class="alert alert-info">You can report anonymously. Your data stays private.</div>
+    <div class="cat-grid">
+      <div class="cat-card" onclick="pickCat(this,'Police / Authority Abuse','🚔')"><div class="cat-emoji">🚔</div><div class="cat-label">Police / Authority Abuse</div></div>
+      <div class="cat-card" onclick="pickCat(this,'Work / School Discrimination','🏫')"><div class="cat-emoji">🏫</div><div class="cat-label">Work / School Discrimination</div></div>
+      <div class="cat-card" onclick="pickCat(this,'Disability Rights Violation','♿')"><div class="cat-emoji">♿</div><div class="cat-label">Disability Rights Violation</div></div>
+      <div class="cat-card" onclick="pickCat(this,'Access Barrier','🚧')"><div class="cat-emoji">🚧</div><div class="cat-label">Access Barrier</div></div>
+      <div class="cat-card" onclick="pickCat(this,'Healthcare Denial','🏥')" style="grid-column:1/-1"><div class="cat-emoji">🏥</div><div class="cat-label">Healthcare Denial</div></div>
+    </div>
+    <button class="btn btn-primary" id="btn-r1" onclick="rStep(2)" disabled>Continue →</button>
+  </div>
+  <div id="r2" style="display:none">
+    <div class="step-bar"><div class="step-dot done"></div><div class="step-dot active"></div><div class="step-dot"></div></div>
+    <div id="r-cat-badge" style="margin-bottom:14px"></div>
+    <div class="form-group">
+      <label class="form-label">What happened? <span class="req">*</span></label>
+      <button class="voice-btn" id="vb1" onclick="vToggle('vb1','r-text')">🎤 Tap to speak your story</button>
+      <textarea id="r-text" rows="5" placeholder="Describe what happened, where and who was involved…"></textarea>
+    </div>
+    <div class="form-group">
+      <label class="form-label">When did this happen?</label>
+      <input type="text" id="r-when" placeholder="e.g. Yesterday, 3 days ago, 15 March 2025">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Where did this happen?</label>
+      <input type="text" id="r-where" placeholder="e.g. Kampala, Mulago Hospital">
+    </div>
+    <div class="form-group">
+      <label class="form-label">How serious is this?</label>
+      <div class="sev-row">
+        <button class="sev-btn" data-level="low" onclick="setSev(this)">Low</button>
+        <button class="sev-btn" data-level="medium" onclick="setSev(this)">Medium</button>
+        <button class="sev-btn" data-level="high" onclick="setSev(this)">High / Urgent</button>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Your name (optional — leave blank for anonymous)</label>
+      <input type="text" id="r-name" placeholder="Anonymous">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Contact for follow-up (optional)</label>
+      <input type="text" id="r-contact" placeholder="Phone or email">
+    </div>
+    <button class="btn btn-primary" onclick="rStep(3)">Review Report →</button>
+    <button class="btn btn-secondary mt-8" onclick="rStep(1)">← Back</button>
+  </div>
+  <div id="r3" style="display:none">
+    <div class="step-bar"><div class="step-dot done"></div><div class="step-dot done"></div><div class="step-dot active"></div></div>
+    <div class="slabel">Review your report</div>
+    <div class="rights-card" id="r-review" style="cursor:default"></div>
+    <button class="btn btn-primary mt-12" onclick="submit()">✅ Submit Report</button>
+    <button class="btn btn-secondary mt-8" onclick="rStep(2)">← Edit</button>
+  </div>
+</div>
+
+<!-- RIGHTS -->
+<div class="screen" id="s-rights">
+  <div style="display:flex;flex-direction:column;height:calc(100vh - 140px)">
+
+    <!-- CHAT HEADER -->
+    <div style="background:var(--green);border-radius:var(--r);padding:14px 16px;margin-bottom:12px;display:flex;align-items:center;gap:12px">
+      <div style="width:42px;height:42px;border-radius:50%;background:rgba(255,255,255,0.18);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">🤖</div>
+      <div style="flex:1">
+        <div style="font-size:15px;font-weight:800;color:#fff">Rights AI Advisor</div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.75);display:flex;align-items:center;gap:5px"><span style="width:6px;height:6px;border-radius:50%;background:#4ade80;display:inline-block"></span>Online · Powered by Claude</div>
+      </div>
+      <button onclick="showRightsRef()" style="background:rgba(255,255,255,0.18);border:none;color:#fff;border-radius:var(--r-xs);padding:6px 10px;font-family:var(--ff);font-size:12px;font-weight:700;cursor:pointer">📖 Rights</button>
+    </div>
+
+    <!-- RIGHTS REFERENCE PANEL (hidden by default) -->
+    <div id="rights-ref-panel" style="display:none;flex:1;overflow-y:auto;margin-bottom:12px">
+      <div class="alert alert-info" style="margin-bottom:10px">Tap any right to ask the AI about it.</div>
+      <div id="rights-list-mobile"></div>
+      <button onclick="hideRightsRef()" class="btn btn-secondary" style="margin-bottom:10px">← Back to Chat</button>
+    </div>
+
+    <!-- CHAT PANEL -->
+    <div id="chat-panel" style="flex:1;display:flex;flex-direction:column;overflow:hidden;background:var(--surface);border-radius:var(--r);border:1px solid var(--border)">
+
+      <!-- MESSAGES -->
+      <div id="m-chat" style="flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px">
+        <div class="m-ai">
+          <div class="mb-ai">
+            <strong>Hello! I'm your Uganda Disability Rights Advisor.</strong><br><br>
+            Ask me anything about your rights under the <em>Persons with Disabilities Act 2020</em> — in plain, simple English.<br><br>
+            Tap a suggestion below to get started 👇
+          </div>
+          <div class="mt">Rights Advisor</div>
+        </div>
+      </div>
+
+      <!-- SUGGESTIONS -->
+      <div id="m-suggests" style="padding:10px 12px;border-top:1px solid var(--border);display:flex;gap:6px;overflow-x:auto;-webkit-overflow-scrolling:touch">
+        <div style="display:flex;gap:6px;flex-shrink:0">
+          <button class="m-chip" onclick="mSuggest(this)">Can I be fired?</button>
+          <button class="m-chip" onclick="mSuggest(this)">Police abused me</button>
+          <button class="m-chip" onclick="mSuggest(this)">Hospital refused me</button>
+          <button class="m-chip" onclick="mSuggest(this)">School won't take me</button>
+          <button class="m-chip" onclick="mSuggest(this)">What are my basic rights?</button>
+        </div>
+      </div>
+
+      <!-- INPUT -->
+      <div style="padding:10px 12px;border-top:1px solid var(--border);display:flex;gap:8px;align-items:flex-end">
+        <textarea id="m-inp" rows="2" placeholder="Ask about your rights…" style="flex:1;resize:none;border-radius:var(--r-sm);padding:10px 12px;font-size:14px;border:1.5px solid var(--border);outline:none;font-family:var(--ff)" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();mSend()}"></textarea>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <button onclick="mVoice()" id="m-vbtn" style="width:38px;height:38px;border-radius:50%;background:var(--blue-light);border:1.5px solid #90caf9;color:var(--blue);font-size:16px;cursor:pointer">🎤</button>
+          <button onclick="mSend()" style="width:38px;height:38px;border-radius:50%;background:var(--green);border:none;color:#fff;font-size:18px;font-weight:700;cursor:pointer">↑</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- LEGAL -->
+<div class="screen" id="s-legal">
+  <div class="alert alert-info">All organizations provide free help to persons with disabilities in Uganda.</div>
+  <div class="tabs">
+    <button class="tab active" onclick="fLegal('all',this)">All</button>
+    <button class="tab" onclick="fLegal('legal',this)">Legal Aid</button>
+    <button class="tab" onclick="fLegal('advocacy',this)">Advocacy</button>
+    <button class="tab" onclick="fLegal('health',this)">Health</button>
+    <button class="tab" onclick="fLegal('police',this)">Police</button>
+  </div>
+  <div id="legal-list"></div>
+</div>
+
+<!-- LETTER -->
+<div class="screen" id="s-letter">
+  <div class="alert alert-warn">Generate an official complaint letter ready to print or email.</div>
+  <div class="form-group"><label class="form-label">Your full name <span class="req">*</span></label><input type="text" id="l-name" placeholder="Your name or 'A Person with a Disability'"></div>
+  <div class="form-group"><label class="form-label">Complaint type <span class="req">*</span></label>
+    <select id="l-type"><option value="">Select…</option><option>Police / Authority Abuse</option><option>Work / School Discrimination</option><option>Disability Rights Violation</option><option>Access Barrier</option><option>Healthcare Denial</option></select></div>
+  <div class="form-group"><label class="form-label">Addressed to</label>
+    <select id="l-to"><option>Ministry of Gender, Labour and Social Development</option><option>Uganda Human Rights Commission</option><option>Uganda Police Force — Professional Standards Unit</option><option>National Council for Disability</option><option>Equal Opportunities Commission</option></select></div>
+  <div class="form-group"><label class="form-label">What happened? <span class="req">*</span></label>
+    <button class="voice-btn" id="vb2" onclick="vToggle('vb2','l-text')">🎤 Tap to speak</button>
+    <textarea id="l-text" rows="4" placeholder="Describe the incident…"></textarea></div>
+  <div class="form-group"><label class="form-label">Desired outcome</label><input type="text" id="l-out" placeholder="e.g. Apology, investigation, compensation"></div>
+  <button class="btn btn-primary" onclick="genLetter()">🤖 Generate Official Letter</button>
+  <div id="letter-result"></div>
+</div>
+
+<!-- TRACK -->
+<div class="screen" id="s-track">
+  <div class="tabs">
+    <button class="tab active" onclick="fRps('all',this)">All</button>
+    <button class="tab" onclick="fRps('submitted',this)">Submitted</button>
+    <button class="tab" onclick="fRps('pending',this)">Draft</button>
+  </div>
+  <div id="track-list"></div>
+</div>
+
+</div>
+<div class="bottom-nav">
+  <button class="nav-item active" onclick="go('s-home',this)"><span class="nav-icon">🏠</span><span class="nav-label">Home</span></button>
+  <button class="nav-item" onclick="go('s-report',this)"><span class="nav-icon">📋</span><span class="nav-label">Report</span></button>
+  <button class="nav-item" onclick="go('s-rights',this)"><span class="nav-icon">⚖️</span><span class="nav-label">Rights</span></button>
+  <button class="nav-item" onclick="go('s-legal',this)"><span class="nav-icon">🏛️</span><span class="nav-label">Legal</span></button>
+  <button class="nav-item" onclick="go('s-track',this)"><span class="nav-icon">📊</span><span class="nav-label">Reports</span></button>
+</div>
+
+<script>
+const RIGHTS=[
+  {tag:"Employment",title:"Right to Work Without Discrimination",body:"Employers cannot refuse to hire, promote, or pay you less because of your disability. The Persons with Disabilities Act 2020 requires reasonable accommodation. Dismissal based on disability is illegal."},
+  {tag:"Education",title:"Right to Inclusive Education",body:"Every child with a disability has the right to attend school. Schools must provide support and adjustments. Refusing admission due to disability violates the law."},
+  {tag:"Healthcare",title:"Right to Healthcare",body:"Public hospitals must not deny treatment based on disability. You have the right to an interpreter or assistive device during medical consultations."},
+  {tag:"Accessibility",title:"Right to Physical Access",body:"New buildings and public spaces must be accessible — ramps, wide doors, accessible bathrooms. Transport providers must accommodate persons with disabilities."},
+  {tag:"Police",title:"Right Against Police Abuse",body:"Police cannot arrest or mistreat you based on disability. Reasonable accommodation must be provided during arrest. You have the right to a lawyer."},
+  {tag:"Voting",title:"Right to Vote",body:"You have the right to vote and polling stations must be accessible. Assistance in voting is your right. Denying access is illegal."},
+  {tag:"Legal",title:"Right to Legal Capacity",body:"You have the right to make your own decisions. No one can take away your legal decision-making power without a court order."},
+  {tag:"Social",title:"Right to Social Protection",body:"Persons with severe disabilities may qualify for government grants. Contact the Ministry of Gender, Labour and Social Development."},
+];
+const LEGAL=[
+  {name:"Uganda Human Rights Commission",tags:["legal","police","advocacy"],phone:"0800 199 000",region:"Nationwide (Toll Free)",desc:"Investigates human rights violations including disability rights."},
+  {name:"LASPNET – Legal Aid Network",tags:["legal","advocacy"],phone:"0414 255 699",region:"Kampala & nationwide",desc:"Network of free legal aid providers across Uganda."},
+  {name:"FIDA Uganda",tags:["legal","advocacy"],phone:"0414 531 556",region:"Kampala",desc:"Legal aid for women with disabilities and gender-based violence."},
+  {name:"NUDIPU – National Union of Disabled Persons",tags:["advocacy"],phone:"0414 510 020",region:"Kampala",desc:"Advocacy and referral for disability rights violations."},
+  {name:"Health Rights Advocacy Forum (HRAF)",tags:["health"],phone:"0752 806 668",region:"Central Uganda",desc:"Healthcare rights, medical negligence and medicine access."},
+  {name:"Foundation for Human Rights Initiative",tags:["police","legal"],phone:"0414 510 263",region:"Kampala",desc:"Police accountability, detention rights and prison oversight."},
+  {name:"Equal Opportunities Commission",tags:["advocacy","legal"],phone:"0414 347 930",region:"Kampala",desc:"Complaints about discrimination in employment and services."},
+];
+let rps=JSON.parse(localStorage.getItem('syh2')||'[]');
+let cat='',catE='',sev='',recActive=false,recObj=null;
+const NM={'s-home':0,'s-report':1,'s-rights':2,'s-legal':3,'s-track':4};
+function go(id,el){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  if(el)el.classList.add('active');else{const i=NM[id];if(i!==undefined)document.querySelectorAll('.nav-item')[i].classList.add('active');}
+  document.querySelector('.scroll-body').scrollTop=0;
+  if(id==='s-home')renderHome();
+  if(id==='s-track')renderTrack('all');
+  if(id==='s-report')resetR();
+  if(id==='s-legal')renderLegal('all');
+  if(id==='s-rights')renderRights('');
+}
+function resetR(){rStep(1);cat='';catE='';sev='';document.querySelectorAll('.cat-card').forEach(c=>c.classList.remove('selected'));['r-text','r-when','r-where','r-name','r-contact'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});document.querySelectorAll('.sev-btn').forEach(b=>b.classList.remove('active'));document.getElementById('btn-r1').disabled=true;}
+function rStep(s){[1,2,3].forEach(n=>document.getElementById('r'+n).style.display=n===s?'block':'none');if(s===3)buildReview();}
+function pickCat(el,n,e){document.querySelectorAll('.cat-card').forEach(c=>c.classList.remove('selected'));el.classList.add('selected');cat=n;catE=e;document.getElementById('btn-r1').disabled=false;}
+function setSev(b){document.querySelectorAll('.sev-btn').forEach(x=>x.classList.remove('active'));b.classList.add('active');sev=b.dataset.level;}
+function buildReview(){
+  const t=document.getElementById('r-text').value||'(Not provided)';
+  document.getElementById('r-review').innerHTML=`
+    <div style="margin-bottom:10px"><span class="rights-tag">${catE} ${cat}</span></div>
+    <table class="review-table">
+      <tr><td>Description</td><td style="font-weight:600">${t.substring(0,100)}${t.length>100?'…':''}</td></tr>
+      <tr><td>When</td><td>${document.getElementById('r-when').value||'Not specified'}</td></tr>
+      <tr><td>Where</td><td>${document.getElementById('r-where').value||'Not specified'}</td></tr>
+      <tr><td>Severity</td><td style="text-transform:capitalize">${sev||'Not set'}</td></tr>
+      <tr><td>Name</td><td>${document.getElementById('r-name').value||'Anonymous'}</td></tr>
+    </table>`;
+}
+function submit(){
+  const ref='SYH-'+Date.now().toString(36).toUpperCase().slice(-6);
+  rps.unshift({id:ref,type:cat,emoji:catE,text:document.getElementById('r-text').value,when:document.getElementById('r-when').value,where:document.getElementById('r-where').value,sev,name:document.getElementById('r-name').value||'Anonymous',contact:document.getElementById('r-contact').value,status:'submitted',date:new Date().toLocaleDateString('en-UG',{day:'numeric',month:'short',year:'numeric'})});
+  localStorage.setItem('syh2',JSON.stringify(rps));
+  document.getElementById('r3').innerHTML=`<div class="success-wrap"><div class="success-icon">✅</div><div class="success-h">Report Submitted!</div><div class="success-p">Your report is recorded. Save your reference number.</div><div class="ref-chip">${ref}</div><div style="font-size:12px;color:var(--muted);margin-top:4px">Screenshot or write this down</div><div style="margin-top:20px;display:flex;flex-direction:column;gap:10px"><button class="btn btn-primary" onclick="go('s-letter')">📝 Generate Complaint Letter</button><button class="btn btn-secondary" onclick="go('s-legal')">🏛️ Find Legal Help</button><button class="btn btn-secondary" onclick="go('s-home')">🏠 Go Home</button></div></div>`;
+}
+function vToggle(btnId,targetId){
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){alert('Voice input not supported. Please type.');return;}
+  if(recActive&&recObj){recObj.stop();return;}
+  recObj=new SR();recObj.continuous=true;recObj.interimResults=true;recObj.lang='en-UG';
+  recObj.onresult=e=>{let t='';for(let i=e.resultIndex;i<e.results.length;i++)t+=e.results[i][0].transcript;document.getElementById(targetId).value=t;};
+  const btn=document.getElementById(btnId);
+  recObj.onend=()=>{recActive=false;btn.textContent='🎤 Tap to speak your story';btn.classList.remove('listening');};
+  recObj.start();recActive=true;btn.textContent='🔴 Listening… tap to stop';btn.classList.add('listening');
+}
+function renderRights(q){
+  const f=q?RIGHTS.filter(r=>r.title.toLowerCase().includes(q)||r.body.toLowerCase().includes(q)||r.tag.toLowerCase().includes(q)):RIGHTS;
+  document.getElementById('rights-list-mobile').innerHTML=f.map(r=>`<div class="rights-card" onclick="askAboutMobile('${r.title.replace(/'/g,"\\'")}')"><div class="rights-tag">${r.tag}</div><div class="rights-title">${r.title}</div><div class="rights-body">${r.body}</div><div style="font-size:11px;color:var(--green);font-weight:700;margin-top:8px">Ask AI about this →</div></div>`).join('');
+}
+function fRights(q){renderRights(q.toLowerCase());}
+function askAboutMobile(t){hideRightsRef();document.getElementById('m-inp').value='Tell me more about: '+t;mSend();}
+function showRightsRef(){document.getElementById('rights-ref-panel').style.display='block';document.getElementById('chat-panel').style.display='none';}
+function hideRightsRef(){document.getElementById('rights-ref-panel').style.display='none';document.getElementById('chat-panel').style.display='flex';}
+
+/* ---- MOBILE CHAT ENGINE ---- */
+let mHistory=[];
+const MSYS=`You are a compassionate, knowledgeable disability rights legal advisor for Uganda. You specialize in:
+- Uganda's Persons with Disabilities Act 2020
+- The Constitution of Uganda 1995 (as amended)
+- The Equal Opportunities Commission Act
+- The Human Rights Commission Act
+- UN CRPD (Convention on the Rights of Persons with Disabilities), which Uganda ratified
+
+Your role:
+- Explain rights clearly and simply — assume the user may have low literacy or limited legal knowledge
+- Always cite the specific law or section where relevant
+- Be warm, empathetic and encouraging
+- Provide practical next steps: who to call, what to say, what to document
+- If a situation sounds urgent or dangerous, provide emergency contacts (Police 999, Uganda Human Rights Commission 0800 199 000)
+- Keep responses concise for mobile — 3-5 short paragraphs max
+- Use simple English
+
+You are embedded in "Sauti ya Haki" (Voice of Justice), a free disability rights app for Uganda.`;
+
+function mTimeStr(){return new Date().toLocaleTimeString('en-UG',{hour:'2-digit',minute:'2-digit'});}
+
+function mAppend(role,html){
+  const wrap=document.getElementById('m-chat');
+  const div=document.createElement('div');
+  div.className=role==='user'?'m-user':'m-ai';
+  const t=mTimeStr();
+  div.innerHTML=role==='user'
+    ?`<div class="mb-user">${html}</div><div class="mt">You · ${t}</div>`
+    :`<div class="mb-ai">${html}</div><div class="mt">Rights Advisor · ${t}</div>`;
+  wrap.appendChild(div);wrap.scrollTop=wrap.scrollHeight;
+}
+
+function mTyping(){
+  const wrap=document.getElementById('m-chat');
+  const div=document.createElement('div');
+  div.className='m-ai';div.id='m-typing';
+  div.innerHTML=`<div class="mb-ai m-typing"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>`;
+  wrap.appendChild(div);wrap.scrollTop=wrap.scrollHeight;
+}
+
+async function mSend(){
+  const inp=document.getElementById('m-inp');
+  const q=inp.value.trim();if(!q)return;
+  inp.value='';
+  document.getElementById('m-suggests').style.display='none';
+  mAppend('user',q.replace(/</g,'&lt;'));
+  mHistory.push({role:'user',content:q});
+  mTyping();
+  const reply=await mClaude(mHistory);
+  const t=document.getElementById('m-typing');if(t)t.remove();
+  const fmt=reply.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n\n/g,'<br><br>').replace(/\n/g,'<br>');
+  mAppend('assistant',fmt);
+  mHistory.push({role:'assistant',content:reply});
+}
+
+function mSuggest(btn){document.getElementById('m-inp').value=btn.textContent;mSend();}
+
+function mVoice(){
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){alert('Voice input not supported. Please type.');return;}
+  const r=new SR();r.lang='en-UG';r.interimResults=false;
+  const btn=document.getElementById('m-vbtn');
+  btn.textContent='🔴';
+  r.onresult=e=>{document.getElementById('m-inp').value=e.results[0][0].transcript;};
+  r.onend=()=>{btn.textContent='🎤';};
+  r.start();
+}
+
+async function mClaude(messages){
+  try{
+    const r=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:800,system:MSYS,messages})
+    });
+    const d=await r.json();
+    return d.content?.[0]?.text||'Sorry, I could not respond. Please try again.';
+  }catch(e){
+    return 'I\'m having trouble connecting. Check your internet and try again.\n\nFor urgent help call: **Uganda Human Rights Commission: 0800 199 000** (free)';
+  }
+}
+function renderLegal(f){
+  const data=f==='all'?LEGAL:LEGAL.filter(l=>l.tags.includes(f));
+  document.getElementById('legal-list').innerHTML=data.length?data.map(l=>`<div class="legal-card"><div class="legal-name">${l.name}</div><span class="legal-tag">${l.tags[0]}</span><div class="legal-detail">📍 ${l.region}</div><div class="legal-detail" style="color:var(--muted)">${l.desc}</div><div class="legal-btns"><button class="legal-btn primary" onclick="window.location.href='tel:${l.phone.replace(/\s/g,'')}'">📞 ${l.phone}</button><button class="legal-btn" onclick="window.open('https://wa.me/?text=Hello, I need help regarding disability rights','_blank')">💬 WhatsApp</button></div></div>`).join(''):'<div class="empty"><div class="empty-icon">🔍</div><p>No results for this filter</p></div>';
+}
+function fLegal(f,btn){document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));btn.classList.add('active');renderLegal(f);}
+async function genLetter(){
+  const name=document.getElementById('l-name').value||'A Person with a Disability';
+  const type=document.getElementById('l-type').value;
+  const to=document.getElementById('l-to').value;
+  const text=document.getElementById('l-text').value;
+  const out=document.getElementById('l-out').value;
+  if(!type||!text){alert('Please fill in complaint type and description.');return;}
+  const box=document.getElementById('letter-result');
+  box.innerHTML=`<div class="ai-box"><div class="ai-header">✍️ Generating letter…</div><div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></div>`;
+  const t=await cl(`Write a formal complaint letter for a person with a disability in Uganda. Writer: ${name}. Date: ${new Date().toLocaleDateString('en-UG',{day:'numeric',month:'long',year:'numeric'})}. To: ${to}. Type: ${type}. Incident: ${text}. Desired outcome: ${out||'Investigation and appropriate action'}. Reference Uganda Persons with Disabilities Act 2020. Firm, polite, professional. Include 14-day response deadline. Write only the letter.`);
+  box.innerHTML=`<div style="margin-top:14px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span style="font-size:13px;font-weight:700;color:var(--green)">📄 Your Complaint Letter</span><button class="btn btn-sm btn-primary" onclick="copyL()">Copy</button></div><div class="letter-box" id="l-out-text">${t}</div><div class="alert alert-warn mt-12">Print, sign, and submit to the relevant office. Keep a copy.</div></div>`;
+}
+function copyL(){const e=document.getElementById('l-out-text');if(e)navigator.clipboard.writeText(e.innerText).then(()=>alert('Copied to clipboard!'));}
+function renderHome(){
+  const el=document.getElementById('home-rps');
+  if(!rps.length){el.innerHTML='<div class="empty" style="padding:16px 0"><div class="empty-icon">📭</div><p style="font-size:14px">No reports yet</p></div>';return;}
+  el.innerHTML=rps.slice(0,2).map(r=>`<div class="rp-card"><div class="rp-head"><div><div class="rp-id">REF: ${r.id}</div><div class="rp-type">${r.emoji} ${r.type}</div></div><span class="badge badge-${r.status}">${r.status}</span></div><div class="rp-preview">${r.text||'No description'}</div></div>`).join('');
+}
+function renderTrack(f){
+  const data=f==='all'?rps:rps.filter(r=>r.status===f);
+  document.getElementById('track-list').innerHTML=data.length?data.map(r=>`<div class="rp-card"><div class="rp-head"><div><div class="rp-id">REF: ${r.id}</div><div class="rp-type">${r.emoji} ${r.type}</div><div class="rp-date">${r.date} · ${r.where||'Location not set'}</div></div><span class="badge badge-${r.status}">${r.status}</span></div><div class="rp-preview">${r.text||'No description'}</div></div>`).join(''):'<div class="empty"><div class="empty-icon">📭</div><p style="font-size:14px">No reports yet. Start by making your first report.</p></div>';
+}
+function fRps(f,btn){document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));btn.classList.add('active');renderTrack(f);}
+async function cl(prompt){
+  try{const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:'You are a disability rights legal assistant for Uganda. Respond clearly and simply. Reference Uganda law where relevant.',messages:[{role:'user',content:prompt}]})});const d=await r.json();return d.content?.[0]?.text||'Sorry, try again.';}catch(e){return 'Connection error. Check internet and try again.';}
+}
+function callSOS(){window.location.href='tel:999';}
+renderHome();renderRights('');renderLegal('all');
+// Pre-render rights list
+renderRights('');
+</script>
+</body>
+</html>
